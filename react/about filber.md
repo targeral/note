@@ -123,7 +123,7 @@ requestIdleCallback(deadline => {
 
 如果你考虑一下，每个递归调用都会向堆栈添加一个帧。它同步这样做。假设我们有以下组件树：
 
-[](./imgs/1_TYWa1WAZ9iLip-rwBNPGEQ.png)
+![](./imgs/1_TYWa1WAZ9iLip-rwBNPGEQ.png)
 
 假设下面的对象都有render函数。你可以将它们视为组件的实例：
 
@@ -189,7 +189,7 @@ a1, b1, b2, c1, d1, d2, b3, c2
 
 下图演示了通过链表链接的对象的层次结构以及它们之间的连接类型：
 
-[](./imgs/1_7dsyUaUpKbFG7EoNR9Cu2w.png)
+![](./imgs/1_7dsyUaUpKbFG7EoNR9Cu2w.png)
 
 所以让我们首先定义我们的自定义节点构造函数：
 
@@ -288,11 +288,11 @@ function walk(o) {
 
 如果我们现在使用此代码实现检查调用堆栈，这是我们将要看到的内容：
 
-[](./imgs/1_ybVgRoNf-dBxR_OKxn4oKQ.gif)
+![](./imgs/1_ybVgRoNf-dBxR_OKxn4oKQ.gif)
 
 正如您所看到的，当我们沿着树走时，堆栈不会增长。但是如果现在将调试器放入doWork函数并记录节点名称，我们将看到以下内容：
 
-[](./imgs/1_ErzqXpJt5KkLKxHCn31hmA.gif)
+![](./imgs/1_ErzqXpJt5KkLKxHCn31hmA.gif)
 
 它看起来像浏览器中的调用栈。因此，使用这种算法，我们可以用我们自己的实现有效地替换浏览器的调用堆栈实现。这就是安德鲁在这里所描述的：
 
@@ -360,7 +360,7 @@ React的文档提供了该机制一个不错的高级概述：React元素的作�
 
 这是一个简单的应用程序，我将在整个系列中使用。我们有一个按钮，只是增加屏幕上呈现的数字：
 
-[](./imgs/1_jTWOx6Yr6JyBV5ETnp4TRQ.gif)
+![](./imgs/1_jTWOx6Yr6JyBV5ETnp4TRQ.gif)
 
 代码实现如下：
 
@@ -408,6 +408,96 @@ React在 **reconciliation** 期间执行各种活动。例如，以下是React�
 <button key="1" onClick={this.onClick}>Update counter</button>
 <span key="2">{this.state.count}</span>
 ```
+
+### React元素
+
+一旦模板通过JSX编译器编译，你就会得到一堆React元素。这些React元素是从React组件的 `render` 方法返回出来的。如果我们不使用JSX语法，那么我们的 ClickCounter组件的render方法可以像这样重写：
+
+``` js
+class ClickCounter {
+    ...
+    render() {
+        return [
+            React.createElement(
+                'button',
+                {
+                    key: '1',
+                    onClick: this.onClick
+                },
+                'Update counter'
+            ),
+            React.createElement(
+                'span',
+                {
+                    key: '2'
+                },
+                this.state.count
+            )
+        ]
+    }
+}
+```
+
+在 **render** 方法中调用 **React.createElement** 将创建两个这样的数据结构：
+
+``` js
+[
+    {
+        $$typeof: Symbol(react.element),
+        type: 'button',
+        key: "1",
+        props: {
+            children: 'Update counter',
+            onClick: () => { ... }
+        }
+    },
+    {
+        $$typeof: Symbol(react.element),
+        type: 'span',
+        key: "2",
+        props: {
+            children: 0
+        }
+    }
+]
+```
+
+你可以看到React将 react元素 作为唯一标识符添加到 `$$typeof`。然后我们`type`、`key`、`props` 来描述元素。这些值取自您传递给React.createElement函数的值。请注意React如何将文本内容表示为span和button节点的子项。以及click处理程序如何成为按钮元素props的一部分。React元素上还有其他字段，如ref字段，超出了本文的范围。
+
+对于 `ClickCounter` 的React元素没有任何props或者key：
+
+``` js
+{
+    $$typeof: Symbol(react.element),
+    key: null,
+    props: {},
+    ref: null,
+    type: ClickCounter
+}
+```
+
+### Fiber节点
+
+在 reconciliation 阶段，由React元素通过render方法返回的数据被合并到fiber节点树中。每个React元素都有一个相应的fiber节点。不像React元素，在每次渲染中fiber并不会重新创建。它们（fibers）是保存着组件state和dom的可变数据结构。
+
+我们之前讨论过，框架会根据React元素的类型执行不同的任务。在我们的示例应用程序中，对于类组件ClickCounter，它调用生命周期方法和渲染方法，而对于span宿主组件（DOM节点），它执行DOM突变。因此，每个React元素都会转换为相应类型的Fibre节点，用于描述需要完成的工作。
+
+**您可以将fiber节点视为代表某些要做的工作的数据结构，换句话说，就是一个工作单元。Fiber的架构还提供了一种跟踪，安排，暂停和中止工作的便捷方式。**
+
+当React元素第一次转换为fiber节点时，React在[createFiberFromTypeAndProps](https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L414)函数中使用元素中的数据创建fiber。在随后的更新阶段，React使用已存在的fiber节点，并使用来自相应React元素的数据更新必要的属性。如果相应的组件不再从render方法返回中返回，React可能还需要根据key属性移动节点或删除它。
+
+*查看[ChildReconciler](https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactChildFiber.js#L239)函数以查看React为现有fiber节点执行的所有活动和相应函数的列表。*
+
+因为React为每个React元素创建了一个fiber，并且因为我们有一个这些元素组成的树，所以我们也将拥有一个fiber节点树。对于我们的示例应用程序，它看起来像这样：
+
+![](./imgs/1_cLqBZRht7RgR9enHet_0fQ.png)
+
+所有fiber节点使用在fiber节点里的这些属性通过链表的方式连接：`child`，`sibling`，`return`。关于为什么这样使用，上文已经说过了。
+
+### 
+
+在第一次渲染后，React最终得到一个fiber树，它反映了用于呈现UI的应用程序的状态。此时，这棵树通常被称为 **current** （树）。当React在更新阶段开始处理工作，它会构建一个所谓的 **workInProgress** 树，它反映了要刷新到屏幕的未来状态。
+
 
 
 ## 链接
