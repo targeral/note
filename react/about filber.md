@@ -494,9 +494,22 @@ class ClickCounter {
 
 所有fiber节点使用在fiber节点里的这些属性通过链表的方式连接：`child`，`sibling`，`return`。关于为什么这样使用，上文已经说过了。
 
-### 
+### Current and work in progress trees
 
 在第一次渲染后，React最终得到一个fiber树，它反映了用于呈现UI的应用程序的状态。此时，这棵树通常被称为 **current** （树）。当React在更新阶段开始处理工作，它会构建一个所谓的 **workInProgress** 树，它反映了要刷新到屏幕的未来状态。
+
+所有的工作任务都是在 **workInProgress** 树中的fiber节点上执行。当React遍历current树时，对于每个现有的fiber节点，它会创建一个备用节点用来构成workInProgress树。而这个备用节点使用React元素的render方法返回的数据来创建。一旦处理完更新并完成所有相关工作后，React将有一个备用节点组成的树准备刷新到屏幕上。一旦这个workInProgress树在屏幕上呈现，它就会变成current树。
+
+React的核心原则之一是一致性。React总是一次性的更新完DOM - 它不会显示部分结果。workInProgress树充当用户不可见的“草稿”，因此React可以先处理所有组件，然后将其更改刷新到屏幕。
+
+在源代码中，您将看到很多函数从current树和workInProgress树中获取fiber节点。这是一个这样的功能的签名：
+
+``` js
+function updateHostComponent(current, workInProgress, renderExpirationTime) {...}
+```
+
+每个fiber节点上的 **alternate** 字段保存着另一个树的对应节点的引用。
+当前树中的节点指向workInProgress树中的节点，反之亦然。
 
 
 
