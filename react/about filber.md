@@ -511,6 +511,142 @@ function updateHostComponent(current, workInProgress, renderExpirationTime) {...
 每个fiber节点上的 **alternate** 字段保存着另一个树的对应节点的引用。
 当前树中的节点指向workInProgress树中的节点，反之亦然。
 
+### 副作用
+
+我们可以将React中的一个组件视为一个使用state和props来计算UI表示的函数。每个其他活动，如改变DOM或调用生命周期方法，都应该被认为是副作用，或者简单地说是一种effect。
+文档中还提到了效果：
+
+*我们在React组件中执行的数据获取，订阅操作或手动更改DOM。我们将这些操作称为“副作用”（或简称为“effect”），因为它们会影响其他组件，并且在渲染过程中无法完成。*
+
+我们知道大多数的state和props的更新操作将会导致产生副作用。由于产生副作用这种操作也是一种工作类型，因此使用一个fiber节点来跟踪除了更新操作以外的副作用是很方便的机制。
+
+因此，在Fiber中的effects字段基本上定义了处理更新后需要为实例完成的工作。对于宿主组件（DOM元素），工作包括添加，更新或删除元素。对于类组件，React可能需要更新ref并调用componentDidMount和componentDidUpdate生命周期方法。当然还存在与其他类型的fiber节点相对应的其他副作用。
+
+### 副作用链表
+
+React的更新过程非常的快，为了达到这种性能，它采用了一些有趣的技术。其中之一就是构建保存各种副作用操作的fiber节点的线性链表用于快速遍历。遍历线性链表比树快得多，并且没有必要在没有副作用的节点上花费时。
+
+此链表的目标是标记具有DOM更新或与其关联的其他副作用的节点。此列表是finishedWork树的子集，并使用nextEffect属性而不是current和workInProgress树中使用的子属性进行链接。
+
+Dan为副作用链表提供了一个类比。他喜欢将它想象成一棵圣诞树，“圣诞灯”将所有有副作用的点绑定在一起。为了使这个可视化，让我们想象下面的fiber节点树，其中突出显示的节点有一些工作要做。例如，我们的更新导致c2被插入到DOM中，d2和c1被用于更改属性，而b2被用于激活生命周期方法。副作用链表将它们链接在一起，以便React稍后可以跳过其他节点：
+
+![](./imgs/1_Q0pCNcK1FfCttek32X_l7A.png)
+
+您可以看到具有效果的节点如何链接在一起。当遍历节点时，React使用firstEffect指针来确定列表的开始位置。所以上图可以表示为这样的线性链表。
+
+![](./imgs/1_mbeZ1EsfMsLUk-9hOYyozw.png)
+
+如您所见，React按照从子节点回溯到父节点的顺序执行这些副作用。
+
+### fiber树的根节点
+
+每个React应用程序都有一个或多个充当容器的DOM元素。在我们的例子中，它是具有`id=container`的div元素。
+
+``` js
+const domContainer = document.querySelector('#container');
+ReactDOM.render(React.createElement(ClickCounter), domContainer);
+```
+
+React为每个容器创建一个fiber根节点对象。您可以使用对DOM元素的引用来访问它：
+
+``` js
+const fiberRoot = query('#container')._reactRootContainer._internalRoot
+```
+
+这个fiber根节点（fiberRoot）是React保存对fiber树的引用的地方。它存储在fiber根节点的current属性中：
+
+``` js
+const hostRootFiberNode = fiberRoot.current
+```
+
+fiber树以特殊类型的fiber节点（HostRoot）开始。它是在内部创建的，并充当最顶层组件的父级。HostRoot fiber节点通过stateNode属性返回得到FiberRoot：
+
+``` js
+fiberRoot.current.stateNode === fiberRoot; // true
+```
+
+您可以通过fiber根访问最顶端的HostRoot fiber节点来探索fiber树。或者，您可以从组件实例中获取单个fiber节点，如下所示：
+
+``` js
+compInstance._reactInternalFiber
+```
+
+### fiber节点的数据结构
+
+现在让我们看一下为ClickCounter组件创建的fiber节点的结构。
+
+``` js
+{
+    stateNode: new ClickCounter,
+    type: ClickCounter,
+    alternate: null,
+    key: null,
+    updateQueue: null,
+    memoizedState: {count: 0},
+    pendingProps: {},
+    memoizedProps: {},
+    tag: 1,
+    effectTag: 0,
+    nextEffect: null
+}
+```
+
+下面是 **span** Dom元素：
+
+``` js
+{
+    stateNode: new HTMLSpanElement,
+    type: "span",
+    alternate: null,
+    key: "2",
+    updateQueue: null,
+    memoizedState: null,
+    pendingProps: {children: 0},
+    memoizedProps: {children: 0},
+    tag: 5,
+    effectTag: 0,
+    nextEffect: null
+}
+```
+
+fiber节点上有很多字段。我在前面的部分中描述了字段alternate，effectTag和nextEffect的用途。现在让我们看看为什么我们需要其他的元素。
+
+#### stateNode
+
+保存对组件的类实例、DOM节点或与fiber节点关联的其他React元素类型的引用。一般来说，我们可以说这个属性用于保存与fiber相关的本地状态。
+
+#### type
+
+定义与此fiber关联的函数或类。对于类组件，它指向构造函数，对于DOM元素，它指定HTML标记。我经常使用这个字段来理解fiber节点与哪个元素相关。
+
+#### tag
+
+定义fiber的类型。它在协调算法中用于确定需要完成的工作。如前所述，工作取决于React元素的类型。函数createFiberFromTypeAndProps将React元素映射到相应的fiber节点类型。在我们的应用程序中，ClickCounter组件的属性标记是1，表示ClassComponent，而span元素的属性标记是5，表示HostComponent。
+
+#### updateQueue
+
+状态更新，回调和DOM更新的队列。
+
+#### memoizedState
+
+之前被创建出到屏幕上的fiber状态。处理更新时，它会反映此时在屏幕上呈现的状态。
+
+#### memoizedProps
+
+在前一次渲染期间被创建输出到屏幕上的的fiber的props。
+
+#### pendingProps
+
+已从React元素中的新数据更新并且需要应用于子组件或DOM元素的props。
+
+#### key
+
+具有一组子项的唯一标识符可帮助React确定哪些项已更改，已添加或从列表中删除。
+它与此处描述的React的[“列表和键”](https://reactjs.org/docs/lists-and-keys.html#keys)功能有关。
+
+
+您可以在[此处](https://github.com/facebook/react/blob/6e4f7c788603dac7fccd227a4852c110b072fe16/packages/react-reconciler/src/ReactFiber.js#L78)找到fiber节点的完整结构。我在上面的解释中省略了一堆字段。特别是，我跳过了指针child，sibling和return（在之前已经解释过了）。以及特定于Scheduler的expirationTime，childExpirationTime和mode等字段类别。
+
 
 
 ## 链接
