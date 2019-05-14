@@ -647,6 +647,42 @@ fiber节点上有很多字段。我在前面的部分中描述了字段alternate
 
 您可以在[此处](https://github.com/facebook/react/blob/6e4f7c788603dac7fccd227a4852c110b072fe16/packages/react-reconciler/src/ReactFiber.js#L78)找到fiber节点的完整结构。我在上面的解释中省略了一堆字段。特别是，我跳过了指针child，sibling和return（在之前已经解释过了）。以及特定于Scheduler的expirationTime，childExpirationTime和mode等字段类别。
 
+### 大体算法
+
+React在两个主要阶段执行工作：**render** 和 **commit**
+
+在第一个 **`render`** 阶段，React通过 **setState** 或者 **React.render** 方法来执行更新组件的计划以此来确定需要更新的UI界面。如果是初始化的渲染，React为每一个由 **render** 函数返回的元素创建一个新的fiber节点。在之后的更新，将重用和更新已经存在的React元素的fiber节点。**这个阶段的结果是生成了一颗标记着副作用的fiber节点树。**这些副作用描述了在下一个 **commit** 阶段需要完成的工作。在 **commit** 阶段，React使用标记副作用的fiber树并将其应用于实例。并在此阶段遍历副作用链表并执行DOM更新和用户可见的其他更改。
+
+**很重要的一点是理解在刚开始 `render` 阶段工作可能是需要异步执行的。** React可以根据可用时间处理一个或多个fiber节点，然后停下来存储已完成的工作并让其他的事件继续进行（理解就是不影响其他的浏览器任务进行）。然后在停止的位置继续。但有时候，它可能需要丢弃完成的工作并再次从头开始。由于在 **render** 阶段执行的工作不会导致任何用户可见的更改（如DOM更新），因此实现这些暂停是可能的。相反，以 **commit** 阶段始终是同步的。这是因为在此阶段执行的工作导致用户可见的变化，例如，DOM更新。这就是React需要一次完成它们的原因。
+
+调用生命周期方法是React执行的一种工作。其中一些生命周期方法在 **render** 阶段调用，另一些在 **commit** 阶段调用。下面是在开始的时候 **render** 阶段生命周期方法被调用的列表：
+
+* `[UNSAFE_]componentWillMount`（被废弃）
+* `[UNSAFE_]componentWillReceiveProps`（被废弃）
+* `getDerivedStateFromProps`
+* `shouldComponentUpdate`
+* `[UNSAFE_]componentWillUpdate`（被废弃）
+* `render`
+
+如你所见，在 **render** 阶段可以执行的一些遗留的生命周期方法在版本16.3中标记为 `UNSAFE`。它们现在在文档中称为遗留生命周期。它们将在未来的16.x版本中弃用，而没有UNSAFE前缀的生命周期钩子将在17.0中删除。
+
+好吧，我们刚刚了解到，因为渲染阶段不会产生像DOM更新这样的副作用，所以React可以异步处理与组件异步的更新（甚至可能在多个线程中执行）。然而，标有UNSAFE的生命周期经常被误解和被当做hack使用。开发人员倾向于将带有副作用的代码放在这些生命周期钩子中执行，这可能会导致新的异步渲染（并且是React不知道的，比如操作dom）从而出现问题。虽然只有没有UNSAFE前缀的对应方法将被删除，但它们仍可能在即将出现的并发模式（您可以选择退出）中引起问题。
+
+这是在 **commit** 阶段执行的生命周期方法列表：
+
+* getSnapshotBeforeUpdate
+* componentDidMount
+* componentDidUpdate
+* componentWillUnmount
+
+因为这些方法在同步提交阶段执行，所以它们可能包含副作用并与DOM有关。
+
+### 渲染阶段
+
+协调算法始终使用renderRoot函数从最顶端的 `HostRoot` fiber节点开始。但是，React从已经处理过的fiber节点中跳出（跳过），直到找到未完成工作的节点。例如，如果在组件树中比较深的地方调用setState，则React将从顶部开始，但会快速跳过所有的父项，直到它到达调用了setState方法的组件。
+
+#### 工作循环的主要步骤
+
 
 
 ## 链接
