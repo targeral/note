@@ -20,3 +20,7 @@ Redux是一种数据架构模式，可以帮助我们在单个窗口系统中（
 
 
 https://medium.com/javascript-in-plain-english/demystifying-redux-with-typescript-2f7c64da5d89
+
+### redux-thunk
+
+https://juejin.im/post/5b035c0c51882565bd258f12

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div class="send">click</div>
+    <script>
+        var ws = new WebSocket("ws://172.24.16.104:8080/chat/aa");
+        // var ws = new WebSocket("ws://172.24.3.0:8080");
+
+            ws.onopen = function (evt) {
+                console.log("Connection open ...");
+                ws.send("Hello WebSockets!");
+            };
+
+            ws.onmessage = function (evt) {
+                console.log("Received Message: " + evt.data);
+            };
+
+            ws.onclose = function (evt) {
+                console.log("Connection closed.");
+            };  
+            document.querySelector('.send').addEventListener('click', () => {
+                ws.send("Hello WebSockets!");
+            })    
+    </script>
+</body>
+</html>
