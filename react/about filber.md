@@ -396,7 +396,7 @@ React在 **reconciliation** 期间执行各种活动。例如，以下是React�
 * 检索并比较 **ClickCounter** 和它们的props
 * 更新span元素的props
 
-在期 **reconciliation** 间执行的其他活动包括调用生命周期方法或更新 `refs`。**所有这些活动在fiber架构中统称为“工作”**。工作类型通常取决于React元素的类型。例如，对于类组件，React需要创建实例，然而对于函数组件不需要这样做。如您所知，React元素中有许多种类型，例如：类和函数组件，宿主组件（DOM节点），portals等.React元素的类型由createElement函数的第一个参数定义。此函数通常在render方法中被使用，用于创建元素。
+在 **reconciliation** 期间执行的其他活动包括调用生命周期方法或更新 `refs`。**所有这些活动在fiber架构中统称为“工作”**。工作类型通常取决于React元素的类型。例如，对于类组件，React需要创建实例，然而对于函数组件不需要这样做。如您所知，React元素中有许多种类型，例如：类和函数组件，宿主组件（DOM节点），portals等.React元素的类型由createElement函数的第一个参数定义。此函数通常在render方法中被使用，用于创建元素。
 
 在我们开始研究各种工作活动和fiber主要的算法之前，让我们首先熟悉React内部使用的数据结构。
 
