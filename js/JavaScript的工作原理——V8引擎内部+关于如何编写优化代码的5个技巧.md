@@ -18,7 +18,7 @@ JavaScript引擎是执行JavaScript代码的程序或解释器。JavaScript引�
 
 ## 为什么V8被创造出来
 
-由谷歌构建的V8引擎是开源的，用C ++编写。此引擎在Google Chrome中使用。然而，与其他引擎不同，V8也用于流行的Node.js运行时中。
+由谷歌构建的V8引擎是开源的，用 C++ 编写。此引擎在Google Chrome中使用。然而，与其他引擎不同，V8也用于流行的Node.js运行时中。
 
 V8最初旨在提高Web浏览器中JavaScript执行的性能。为了获得速度，V8将JavaScript代码转换为更高效的机器代码，而不是使用解释器的方式来解析代码。它通过实现像许多现代JavaScript引擎（如SpiderMonkey或Rhino（Mozilla））的JIT（即时）编译器，在执行时将JavaScript代码编译为机器代码。他们的主要区别是V8不产生字节码或任何中间代码。
 

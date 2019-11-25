@@ -1,0 +1,1 @@
+https://www.zhangxinxu.com/wordpress/2013/01/progressive-jpeg-image-and-so-on/

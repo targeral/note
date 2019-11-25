@@ -51,6 +51,7 @@ https://juejin.im/post/5ad413ba6fb9a028b5485866
 https://juejin.im/post/5b9200865188255c672e8cfd
 https://www.zhihu.com/question/59953136
 https://github.com/snabbdom/snabbdom
+https://juejin.im/post/5cc41a18e51d456e537ef387#heading-13
 
 ### 代码管理方式：monorepo 
 

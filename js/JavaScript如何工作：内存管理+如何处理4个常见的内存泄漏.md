@@ -337,6 +337,24 @@ element.parentNode.removeChild(element);
 
 JavaScript开发的一个关键方面是闭包：一个内部函数，可以访问外部（封闭）函数的变量。由于JavaScript运行时的实现细节，可能会以下列方式泄漏内存：
 
+``` js
+var theThing = null;
+var replaceThing = function () {
+  var originalThing = theThing;
+  var unused = function () {
+    if (originalThing) // a reference to 'originalThing'
+      console.log("hi");
+  };
+  theThing = {
+    longStr: new Array(1000000).join('*'),
+    someMethod: function () {
+      console.log("message");
+    }
+  };
+};
+setInterval(replaceThing, 1000);
+```
+
 一旦调用了replaceThing，theThing将获得一个新对象，该对象由一个大数组和一个新的闭包（someMethod）组成。
 然而，originalThing由一个由未使用的变量保持的闭包引用（它是从之前调用replaceThing的theThing变量）。
 要记住的是，一旦为同一父作用域中的闭包创建了闭包范围，就会共享作用域。
