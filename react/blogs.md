@@ -8,3 +8,4 @@ https://segmentfault.com/a/1190000017483690
 
 react hooks: https://www.youtube.com/watch?v=V-QO-KO90iQ&t=3060s (over)
 suspense: https://www.youtube.com/watch?v=6g3g0Q_XVb4
+react fiber: https://www.youtube.com/watch?v=aS41Y_eyNrU
