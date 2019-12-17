@@ -4,4 +4,7 @@ https://indepth.dev/inside-fiber-in-depth-overview-of-the-new-reconciliation-alg
 
 https://segmentfault.com/a/1190000017483690
 
-https://www.youtube.com/watch?v=V-QO-KO90iQ&t=3060s
+## Dan
+
+react hooks: https://www.youtube.com/watch?v=V-QO-KO90iQ&t=3060s (over)
+suspense: https://www.youtube.com/watch?v=6g3g0Q_XVb4
