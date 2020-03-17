@@ -16,3 +16,5 @@ https://blog.csdn.net/wishfly/article/details/51919441
 http://lingfei.wang/technote/2014/09/26/hls/
 
 https://juejin.im/post/5ab851b6f265da23826df601
+
+https://aotu.io/notes/2016/10/09/HTML5-SopCast/index.html

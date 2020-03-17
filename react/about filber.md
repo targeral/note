@@ -689,4 +689,6 @@ React在两个主要阶段执行工作：**render** 和 **commit**
 
 * https://medium.com/react-in-depth/the-how-and-why-on-reacts-usage-of-linked-list-in-fiber-67f1014d0eb7
 * https://medium.com/react-in-depth/inside-fiber-in-depth-overview-of-the-new-reconciliation-algorithm-in-react-e1c04700ef6e （current）
+* https://indepth.dev/in-depth-explanation-of-state-and-props-update-in-react/
 * https://blog.angularindepth.com/what-every-front-end-developer-should-know-about-change-detection-in-angular-and-react-508f83f58c6a
+https://react.jokcy.me/book/hooks/hooks-start.html
