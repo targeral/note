@@ -810,5 +810,4 @@ https://blog.csdn.net/sinat_17775997/article/details/83023148
 https://segmentfault.com/a/1190000015919863
 https://sebastianblade.com/using-webpack-to-achieve-long-term-cache/
 https://markus.oberlehner.net/blog/setting-up-a-vue-project-with-webpack-4-and-babel-7/
-
-test23456
+https://webpack.wuhaolin.cn/5%E5%8E%9F%E7%90%86/5-2%E8%BE%93%E5%87%BA%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90.html
