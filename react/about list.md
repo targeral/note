@@ -1,0 +1,1 @@
+https://medium.com/better-programming/how-i-rendered-a-massive-list-in-react-without-memory-and-cpu-issues-7ac6fe6a697b

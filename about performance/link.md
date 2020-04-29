@@ -15,3 +15,5 @@ https://leohxj.gitbooks.io/front-end-database/preference/mobile-h5-performance.h
 [Web 性能优化-首屏和白屏时间](https://lz5z.com/Web%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E9%A6%96%E5%B1%8F%E5%92%8C%E7%99%BD%E5%B1%8F%E6%97%B6%E9%97%B4/)
 [前端性能监控方案（首屏、白屏时间等）](https://juejin.im/post/5df4294d518825128306cd5c)
 https://web.dev/
+
+https://developers.google.com/web/fundamentals/performance/optimizing-javascript/code-splitting?hl=zh-cn
