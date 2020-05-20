@@ -17,3 +17,7 @@ https://leohxj.gitbooks.io/front-end-database/preference/mobile-h5-performance.h
 https://web.dev/
 
 https://developers.google.com/web/fundamentals/performance/optimizing-javascript/code-splitting?hl=zh-cn
+http://jartto.wang/2019/02/16/web-optimization/
+
+https://www.cnblogs.com/fundebug/p/10688073.html
+https://www.cnblogs.com/xianyulaodi/p/5755079.html
