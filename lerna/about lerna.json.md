@@ -1,0 +1,2 @@
+# about lerna.json
+
