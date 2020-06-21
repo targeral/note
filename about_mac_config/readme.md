@@ -2,7 +2,7 @@ oh-my-mac 极致前端开发环境配置手册
 
 显示器
 
-- 公司发的 DELL 27 寸显示器，比较强劲：
+-  DELL 27 寸显示器，比较强劲：
   - 连上 macbook ，可以为其充电；
   - 左边 USB 口，可以接无线鼠标等设备；
   - 这样一来，macbook 上可以不需要再接充电器/拓展插槽了，桌面更为整洁。
@@ -134,11 +134,7 @@ nvm ls  # 查看所有安装的 node 版本
 nvm install <version> # 安装 node
 nvm alias default 12.17.0  # 为所有 shell 终端指定默认版本
 nvm use 12.17.0   # 为当前 shell 指定版本，关闭当前终端后，use 失效
-- 修改源为公司私有源，提高 npm install 时的速度
-node install nrm -g  # 安装源管理器
-nrm ls
-nrm add bnpm http://bnpm.byted.org
-nrm use bnpm
+
 tldr
 - 安装
 brew install tldr
