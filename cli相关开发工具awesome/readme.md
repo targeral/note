@@ -112,3 +112,7 @@ watcher.on('add', filePath => {
 node fs的更加贴近实际应用的操作。
 
 Node.js: extra methods for the fs object like copy(), remove(), mkdirs()
+
+## [inquirer](https://github.com/SBoudrias/Inquirer.js#readme)
+
+常见的交互式命令行用户界面的集合。
